@@ -1,0 +1,4004 @@
+```html
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>NOVA Weather Pro 2.0</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#07111f;
+    --card:rgba(13,25,45,.68);
+    --card2:rgba(255,255,255,.07);
+    --border:rgba(255,255,255,.12);
+    --text:#fff;
+    --muted:#a9b7ca;
+    --accent:#65d8ff;
+    --accent2:#7c5cff;
+    --success:#62f0b2;
+    --danger:#ff6f91;
+}
+
+body{
+    min-height:100vh;
+    font-family:
+        Tahoma,
+        Arial,
+        sans-serif;
+    color:var(--text);
+    background:#030711;
+    overflow-x:hidden;
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+.background{
+    position:fixed;
+    inset:0;
+    z-index:-10;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 20% 20%,rgba(41,113,255,.25),transparent 30%),
+        radial-gradient(circle at 80% 25%,rgba(145,53,255,.20),transparent 28%),
+        radial-gradient(circle at 50% 90%,rgba(0,217,255,.15),transparent 35%),
+        #030711;
+}
+
+.aurora{
+    position:absolute;
+    width:700px;
+    height:700px;
+    border-radius:50%;
+    filter:blur(90px);
+    opacity:.32;
+    animation:auroraMove 14s ease-in-out infinite alternate;
+}
+
+.aurora.a1{
+    background:#0077ff;
+    top:-300px;
+    right:-180px;
+}
+
+.aurora.a2{
+    background:#8a2cff;
+    bottom:-350px;
+    left:-200px;
+    animation-delay:3s;
+}
+
+.aurora.a3{
+    background:#00d9ff;
+    top:35%;
+    left:35%;
+    width:450px;
+    height:450px;
+    opacity:.16;
+    animation-delay:6s;
+}
+
+@keyframes auroraMove{
+    from{
+        transform:translate(-50px,-20px) scale(1);
+    }
+    to{
+        transform:translate(80px,60px) scale(1.25);
+    }
+}
+
+.stars{
+    position:absolute;
+    inset:0;
+    background-image:
+        radial-gradient(circle,#fff 1px,transparent 1px),
+        radial-gradient(circle,rgba(255,255,255,.65) 1px,transparent 1px);
+    background-size:90px 90px,145px 145px;
+    background-position:0 0,40px 60px;
+    opacity:.25;
+    animation:starsMove 35s linear infinite;
+}
+
+@keyframes starsMove{
+    from{
+        transform:translateY(0);
+    }
+    to{
+        transform:translateY(90px);
+    }
+}
+
+.horizon{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:-180px;
+    height:420px;
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(0,210,255,.22),
+            transparent 65%
+        );
+    filter:blur(30px);
+}
+
+/* weather background */
+
+body.sunny .background{
+    background:
+        radial-gradient(circle at 75% 20%,rgba(255,181,71,.32),transparent 30%),
+        radial-gradient(circle at 15% 70%,rgba(0,180,255,.22),transparent 35%),
+        #071322;
+}
+
+body.cloudy .background{
+    background:
+        radial-gradient(circle at 50% 10%,rgba(130,160,190,.22),transparent 30%),
+        linear-gradient(135deg,#08111d,#16283a,#07111e);
+}
+
+body.rainy .background{
+    background:
+        radial-gradient(circle at 60% 15%,rgba(0,170,255,.22),transparent 32%),
+        linear-gradient(135deg,#020812,#081a2c,#020711);
+}
+
+body.storm .background{
+    background:
+        radial-gradient(circle at 50% 20%,rgba(130,90,255,.3),transparent 35%),
+        linear-gradient(135deg,#060313,#15102b,#03040b);
+}
+
+body.snowy .background{
+    background:
+        radial-gradient(circle at 50% 20%,rgba(210,240,255,.28),transparent 35%),
+        linear-gradient(135deg,#07121d,#172b3a,#07111c);
+}
+
+body.night .background{
+    background:
+        radial-gradient(circle at 75% 15%,rgba(102,74,255,.3),transparent 30%),
+        radial-gradient(circle at 15% 70%,rgba(0,130,255,.16),transparent 35%),
+        #02050c;
+}
+
+/* particles */
+
+.weather-effects{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:1;
+    overflow:hidden;
+}
+
+.rain-drop{
+    position:absolute;
+    width:1px;
+    height:90px;
+    background:linear-gradient(
+        transparent,
+        rgba(120,220,255,.65)
+    );
+    animation:rainFall linear infinite;
+}
+
+@keyframes rainFall{
+    from{
+        transform:translateY(-120px) rotate(12deg);
+    }
+    to{
+        transform:translateY(110vh) rotate(12deg);
+    }
+}
+
+.snow-flake{
+    position:absolute;
+    color:white;
+    font-size:14px;
+    animation:snowFall linear infinite;
+    text-shadow:0 0 10px white;
+}
+
+@keyframes snowFall{
+    from{
+        transform:translateY(-40px) rotate(0);
+    }
+    to{
+        transform:translateY(110vh) rotate(360deg);
+    }
+}
+
+.lightning{
+    position:absolute;
+    inset:0;
+    background:white;
+    opacity:0;
+    animation:lightningFlash 7s infinite;
+}
+
+@keyframes lightningFlash{
+    0%,94%,97%,100%{
+        opacity:0;
+    }
+    95%{
+        opacity:.08;
+    }
+    96%{
+        opacity:0;
+    }
+}
+
+/* =========================
+   APP
+========================= */
+
+.container{
+    width:min(1450px,94%);
+    margin:auto;
+    padding:28px 0 50px;
+    position:relative;
+    z-index:2;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.logo-icon{
+    width:52px;
+    height:52px;
+    border-radius:17px;
+    display:grid;
+    place-items:center;
+    font-size:27px;
+    background:
+        linear-gradient(135deg,
+        rgba(101,216,255,.25),
+        rgba(124,92,255,.3));
+    border:1px solid var(--border);
+    box-shadow:
+        0 0 30px rgba(50,180,255,.18);
+}
+
+.logo h1{
+    font-size:22px;
+    letter-spacing:.5px;
+}
+
+.logo p{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:3px;
+}
+
+.header-actions{
+    display:flex;
+    gap:10px;
+}
+
+.icon-btn{
+    width:44px;
+    height:44px;
+    border:none;
+    border-radius:14px;
+    color:white;
+    cursor:pointer;
+    background:rgba(255,255,255,.08);
+    border:1px solid var(--border);
+    transition:.25s;
+}
+
+.icon-btn:hover{
+    transform:translateY(-3px);
+    background:rgba(255,255,255,.14);
+}
+
+/* search */
+
+.search-box{
+    display:flex;
+    gap:10px;
+    margin-bottom:22px;
+}
+
+.search-wrapper{
+    flex:1;
+    position:relative;
+}
+
+.search-wrapper input{
+    width:100%;
+    height:58px;
+    border:none;
+    outline:none;
+    border-radius:19px;
+    padding:0 55px 0 20px;
+    color:white;
+    font-size:15px;
+    background:rgba(255,255,255,.075);
+    border:1px solid var(--border);
+    backdrop-filter:blur(20px);
+    box-shadow:0 15px 50px rgba(0,0,0,.15);
+}
+
+.search-wrapper input::placeholder{
+    color:#8290a5;
+}
+
+.search-icon{
+    position:absolute;
+    right:18px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#8da4bd;
+}
+
+.search-btn{
+    width:125px;
+    border:none;
+    border-radius:18px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    background:
+        linear-gradient(
+            135deg,
+            #159de7,
+            #7357ff
+        );
+    box-shadow:
+        0 10px 35px rgba(66,117,255,.28);
+    transition:.25s;
+}
+
+.search-btn:hover{
+    transform:translateY(-2px);
+}
+
+.location-btn{
+    width:58px;
+    border:none;
+    border-radius:18px;
+    cursor:pointer;
+    color:white;
+    background:rgba(255,255,255,.08);
+    border:1px solid var(--border);
+}
+
+/* autocomplete */
+
+.suggestions{
+    position:absolute;
+    top:65px;
+    left:0;
+    right:0;
+    background:rgba(7,16,30,.96);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    display:none;
+    z-index:50;
+    backdrop-filter:blur(20px);
+}
+
+.suggestion{
+    padding:14px 18px;
+    cursor:pointer;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    transition:.2s;
+}
+
+.suggestion:hover{
+    background:rgba(100,200,255,.10);
+}
+
+.suggestion strong{
+    display:block;
+}
+
+.suggestion span{
+    color:var(--muted);
+    font-size:12px;
+}
+
+/* loading */
+
+.loading{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:15px;
+    margin-bottom:20px;
+    color:#b8dfff;
+}
+
+.loader{
+    width:20px;
+    height:20px;
+    border:3px solid rgba(255,255,255,.15);
+    border-top-color:#61d8ff;
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.error{
+    display:none;
+    padding:15px 18px;
+    margin-bottom:20px;
+    border-radius:16px;
+    background:rgba(255,70,100,.1);
+    border:1px solid rgba(255,100,130,.25);
+    color:#ffc0cd;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.dashboard{
+    display:grid;
+    grid-template-columns:
+        minmax(0,1.5fr)
+        minmax(300px,.8fr);
+    gap:20px;
+}
+
+.card{
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.085),
+            rgba(255,255,255,.035)
+        );
+    border:1px solid var(--border);
+    border-radius:26px;
+    backdrop-filter:blur(25px);
+    box-shadow:
+        0 25px 70px rgba(0,0,0,.2);
+}
+
+/* main weather */
+
+.main-weather{
+    min-height:390px;
+    padding:30px;
+    position:relative;
+    overflow:hidden;
+}
+
+.main-weather::after{
+    content:"";
+    position:absolute;
+    width:280px;
+    height:280px;
+    border-radius:50%;
+    background:rgba(80,190,255,.12);
+    filter:blur(40px);
+    left:-120px;
+    bottom:-150px;
+}
+
+.location{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.location-name{
+    font-size:25px;
+    font-weight:bold;
+}
+
+.location-meta{
+    color:var(--muted);
+    margin-top:7px;
+    font-size:13px;
+}
+
+.favorite{
+    border:none;
+    background:rgba(255,255,255,.08);
+    color:white;
+    width:43px;
+    height:43px;
+    border-radius:14px;
+    cursor:pointer;
+}
+
+.weather-center{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:30px;
+    min-height:245px;
+}
+
+.weather-icon{
+    font-size:105px;
+    filter:
+        drop-shadow(
+            0 15px 30px
+            rgba(0,0,0,.25)
+        );
+}
+
+.temperature{
+    font-size:86px;
+    font-weight:800;
+    line-height:1;
+    letter-spacing:-5px;
+}
+
+.degree{
+    font-size:35px;
+    vertical-align:top;
+    margin-right:4px;
+}
+
+.condition{
+    margin-top:13px;
+    font-size:19px;
+    color:#d8e7f8;
+}
+
+.feels{
+    color:var(--muted);
+    margin-top:7px;
+    font-size:13px;
+}
+
+.updated{
+    text-align:center;
+    color:#8394a9;
+    font-size:12px;
+}
+
+/* stats */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+}
+
+.stat{
+    padding:20px;
+    min-height:125px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.stat-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.stat-icon{
+    width:36px;
+    height:36px;
+    border-radius:11px;
+    display:grid;
+    place-items:center;
+    background:rgba(255,255,255,.08);
+}
+
+.stat-value{
+    font-size:21px;
+    font-weight:bold;
+}
+
+/* full sections */
+
+.full{
+    grid-column:1/-1;
+}
+
+.section{
+    padding:25px;
+}
+
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.section-title h2{
+    font-size:18px;
+}
+
+.section-title span{
+    font-size:12px;
+    color:var(--muted);
+}
+
+/* hourly */
+
+.hourly{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:7px;
+}
+
+.hourly::-webkit-scrollbar{
+    height:5px;
+}
+
+.hourly::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.15);
+    border-radius:20px;
+}
+
+.hour{
+    min-width:90px;
+    padding:16px 10px;
+    text-align:center;
+    border-radius:18px;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.07);
+}
+
+.hour.current{
+    background:
+        linear-gradient(
+            145deg,
+            rgba(61,191,255,.20),
+            rgba(119,77,255,.16)
+        );
+    border-color:rgba(100,210,255,.25);
+}
+
+.hour-time{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.hour-icon{
+    font-size:28px;
+    margin:10px 0;
+}
+
+.hour-temp{
+    font-weight:bold;
+}
+
+.hour-rain{
+    color:#68cfff;
+    font-size:10px;
+    margin-top:5px;
+}
+
+/* forecast */
+
+.forecast{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:10px;
+}
+
+.day{
+    padding:18px 10px;
+    border-radius:18px;
+    text-align:center;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.06);
+}
+
+.day-name{
+    font-size:12px;
+    color:var(--muted);
+}
+
+.day-icon{
+    font-size:35px;
+    margin:14px 0;
+}
+
+.day-temp{
+    font-weight:bold;
+}
+
+.day-low{
+    color:#8ea0b5;
+    margin-top:5px;
+    font-size:12px;
+}
+
+/* chart */
+
+.chart-box{
+    height:280px;
+    position:relative;
+}
+
+#temperatureChart{
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+/* map */
+
+.map{
+    height:300px;
+    position:relative;
+    overflow:hidden;
+    border-radius:20px;
+    background:
+        radial-gradient(
+            circle at 40% 45%,
+            rgba(0,180,255,.13),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #071421,
+            #0b2030
+        );
+}
+
+.map::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    opacity:.18;
+    background-image:
+        linear-gradient(
+            rgba(100,200,255,.25) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(100,200,255,.25) 1px,
+            transparent 1px
+        );
+    background-size:40px 40px;
+}
+
+.map-road{
+    position:absolute;
+    width:160%;
+    height:2px;
+    background:rgba(255,255,255,.12);
+    transform:rotate(25deg);
+    top:45%;
+    left:-30%;
+}
+
+.map-road.r2{
+    transform:rotate(-18deg);
+    top:65%;
+}
+
+.map-pin{
+    position:absolute;
+    width:20px;
+    height:20px;
+    border-radius:50% 50% 50% 0;
+    background:#51d5ff;
+    transform:rotate(-45deg);
+    box-shadow:
+        0 0 0 8px rgba(81,213,255,.12),
+        0 0 35px #51d5ff;
+    transition:.7s;
+}
+
+.map-pin::after{
+    content:"";
+    position:absolute;
+    width:7px;
+    height:7px;
+    background:white;
+    border-radius:50%;
+    top:6px;
+    left:6px;
+}
+
+.map-label{
+    position:absolute;
+    bottom:18px;
+    right:18px;
+    padding:9px 13px;
+    border-radius:12px;
+    background:rgba(0,0,0,.35);
+    font-size:12px;
+    color:#bcd1e7;
+}
+
+/* favorites */
+
+.favorites{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+}
+
+.fav{
+    min-width:150px;
+    padding:15px;
+    border-radius:17px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.07);
+    cursor:pointer;
+    transition:.2s;
+}
+
+.fav:hover{
+    transform:translateY(-3px);
+    background:rgba(255,255,255,.09);
+}
+
+.fav strong{
+    display:block;
+}
+
+.fav small{
+    color:var(--muted);
+}
+
+/* alert */
+
+.alert{
+    padding:17px 18px;
+    border-radius:17px;
+    background:rgba(255,180,70,.08);
+    border:1px solid rgba(255,180,70,.18);
+    color:#ffd59c;
+    font-size:13px;
+}
+
+/* responsive */
+
+@media(max-width:1000px){
+    .dashboard{
+        grid-template-columns:1fr;
+    }
+
+    .full{
+        grid-column:auto;
+    }
+
+    .forecast{
+        grid-template-columns:repeat(4,1fr);
+    }
+}
+
+@media(max-width:650px){
+
+    .container{
+        width:94%;
+        padding-top:18px;
+    }
+
+    header{
+        margin-bottom:18px;
+    }
+
+    .logo h1{
+        font-size:18px;
+    }
+
+    .search-box{
+        display:grid;
+        grid-template-columns:1fr 55px;
+    }
+
+    .search-btn{
+        width:auto;
+        height:55px;
+        grid-column:1/-1;
+        grid-row:2;
+    }
+
+    .location-btn{
+        grid-column:2;
+        grid-row:1;
+    }
+
+    .search-wrapper{
+        grid-column:1;
+        grid-row:1;
+    }
+
+    .main-weather{
+        padding:22px;
+    }
+
+    .weather-center{
+        gap:10px;
+    }
+
+    .weather-icon{
+        font-size:72px;
+    }
+
+    .temperature{
+        font-size:64px;
+    }
+
+    .condition{
+        font-size:16px;
+    }
+
+    .stats-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .forecast{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .section{
+        padding:19px;
+    }
+
+    .map{
+        height:240px;
+    }
+}
+
+@media(max-width:400px){
+    .weather-center{
+        flex-direction:column;
+        gap:4px;
+    }
+
+    .main-weather{
+        min-height:430px;
+    }
+
+    .weather-icon{
+        font-size:65px;
+    }
+
+    .temperature{
+        font-size:58px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="background">
+    <div class="aurora a1"></div>
+    <div class="aurora a2"></div>
+    <div class="aurora a3"></div>
+    <div class="stars"></div>
+    <div class="horizon"></div>
+</div>
+
+<div class="weather-effects" id="weatherEffects">
+    <div class="lightning"></div>
+</div>
+
+<div class="container">
+
+<header>
+
+    <div class="logo">
+        <div class="logo-icon">🌌</div>
+
+        <div>
+            <h1>NOVA Weather</h1>
+            <p>Professional Weather Dashboard</p>
+        </div>
+    </div>
+
+    <div class="header-actions">
+        <button
+            class="icon-btn"
+            id="themeBtn"
+            title="تغییر حالت">
+            ◐
+        </button>
+    </div>
+
+</header>
+
+
+<!-- SEARCH -->
+
+<div class="search-box">
+
+    <div class="search-wrapper">
+
+        <span class="search-icon">⌕</span>
+
+        <input
+            id="cityInput"
+            type="text"
+            autocomplete="off"
+            placeholder="نام شهر را وارد کنید؛ مثلا تهران">
+
+        <div
+            id="suggestions"
+            class="suggestions">
+        </div>
+
+    </div>
+
+    <button
+        class="location-btn"
+        id="locationBtn"
+        title="موقعیت فعلی">
+        📍
+    </button>
+
+    <button
+        class="search-btn"
+        id="searchBtn">
+        جستجوی شهر
+    </button>
+
+</div>
+
+
+<div
+    class="loading"
+    id="loading">
+
+    <div class="loader"></div>
+
+    <span>
+        در حال دریافت اطلاعات آب‌وهوا...
+    </span>
+
+</div>
+
+
+<div
+    class="error"
+    id="error">
+</div>
+
+
+<div class="dashboard">
+
+
+<!-- MAIN WEATHER -->
+
+<section class="card main-weather">
+
+    <div class="location">
+
+        <div>
+
+            <div
+                class="location-name"
+                id="locationName">
+                تهران
+            </div>
+
+            <div
+                class="location-meta"
+                id="locationMeta">
+                در حال دریافت اطلاعات...
+            </div>
+
+        </div>
+
+        <button
+            class="favorite"
+            id="favoriteBtn">
+            ☆
+        </button>
+
+    </div>
+
+
+    <div class="weather-center">
+
+        <div
+            class="weather-icon"
+            id="weatherIcon">
+            🌤️
+        </div>
+
+        <div>
+
+            <div
+                class="temperature"
+                id="temperature">
+                --
+                <span class="degree">°</span>
+            </div>
+
+            <div
+                class="condition"
+                id="condition">
+                در حال بارگذاری...
+            </div>
+
+            <div
+                class="feels"
+                id="feels">
+                احساس می‌شود: --
+            </div>
+
+        </div>
+
+    </div>
+
+    <div
+        class="updated"
+        id="updated">
+        --
+    </div>
+
+</section>
+
+
+<!-- STATS -->
+
+<div class="stats-grid">
+
+    <div class="card stat">
+
+        <div class="stat-top">
+            <span>رطوبت</span>
+            <div class="stat-icon">💧</div>
+        </div>
+
+        <div
+            class="stat-value"
+            id="humidity">
+            --
+        </div>
+
+    </div>
+
+
+    <div class="card stat">
+
+        <div class="stat-top">
+            <span>سرعت باد</span>
+            <div class="stat-icon">💨</div>
+        </div>
+
+        <div
+            class="stat-value"
+            id="wind">
+            --
+        </div>
+
+    </div>
+
+
+    <div class="card stat">
+
+        <div class="stat-top">
+            <span>احتمال بارش</span>
+            <div class="stat-icon">🌧️</div>
+        </div>
+
+        <div
+            class="stat-value"
+            id="rainChance">
+            --
+        </div>
+
+    </div>
+
+
+    <div class="card stat">
+
+        <div class="stat-top">
+            <span>دید افقی</span>
+            <div class="stat-icon">👁️</div>
+        </div>
+
+        <div
+            class="stat-value"
+            id="visibility">
+            --
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- DETAILS -->
+
+<section class="card full section">
+
+    <div class="section-title">
+        <h2>جزئیات امروز</h2>
+        <span id="localTime">--</span>
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat">
+
+            <div class="stat-top">
+                <span>طلوع آفتاب</span>
+                <div class="stat-icon">🌅</div>
+            </div>
+
+            <div
+                class="stat-value"
+                id="sunrise">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-top">
+                <span>غروب آفتاب</span>
+                <div class="stat-icon">🌇</div>
+            </div>
+
+            <div
+                class="stat-value"
+                id="sunset">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-top">
+                <span>فشار هوا</span>
+                <div class="stat-icon">🧭</div>
+            </div>
+
+            <div
+                class="stat-value"
+                id="pressure">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-top">
+                <span>جهت باد</span>
+                <div class="stat-icon">🧭</div>
+            </div>
+
+            <div
+                class="stat-value"
+                id="windDirection">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-top">
+                <span>شاخص UV</span>
+                <div class="stat-icon">☀️</div>
+            </div>
+
+            <div
+                class="stat-value"
+                id="uv">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-top">
+                <span>بارش</span>
+                <div class="stat-icon">🌧️</div>
+            </div>
+
+            <div
+                class="stat-value"
+                id="precipitation">
+                --
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ALERT -->
+
+<section class="card full section">
+
+    <div class="section-title">
+        <h2>وضعیت</h2>
+    </div>
+
+    <div
+        class="alert"
+        id="weatherAlert">
+        در حال بررسی شرایط آب‌وهوا...
+    </div>
+
+</section>
+
+
+<!-- HOURLY -->
+
+<section class="card full section">
+
+    <div class="section-title">
+
+        <h2>
+            پیش‌بینی ساعتی
+        </h2>
+
+        <span>
+            24 ساعت آینده
+        </span>
+
+    </div>
+
+    <div
+        class="hourly"
+        id="hourly">
+    </div>
+
+</section>
+
+
+<!-- CHART -->
+
+<section class="card full section">
+
+    <div class="section-title">
+
+        <h2>
+            نمودار دما
+        </h2>
+
+        <span>
+            24 ساعت آینده
+        </span>
+
+    </div>
+
+    <div class="chart-box">
+        <canvas id="temperatureChart"></canvas>
+    </div>
+
+</section>
+
+
+<!-- 7 DAYS -->
+
+<section class="card full section">
+
+    <div class="section-title">
+
+        <h2>
+            پیش‌بینی ۷ روزه
+        </h2>
+
+        <span>
+            Forecast
+        </span>
+
+    </div>
+
+    <div
+        class="forecast"
+        id="forecast">
+    </div>
+
+</section>
+
+
+<!-- MAP -->
+
+<section class="card full section">
+
+    <div class="section-title">
+
+        <h2>
+            موقعیت شهر
+        </h2>
+
+        <span id="coordinates">
+            --
+        </span>
+
+    </div>
+
+    <div class="map">
+
+        <div class="map-road"></div>
+        <div class="map-road r2"></div>
+
+        <div
+            class="map-pin"
+            id="mapPin">
+        </div>
+
+        <div
+            class="map-label"
+            id="mapLabel">
+            --
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FAVORITES -->
+
+<section class="card full section">
+
+    <div class="section-title">
+
+        <h2>
+            شهرهای مورد علاقه
+        </h2>
+
+        <span>
+            ذخیره‌شده روی دستگاه
+        </span>
+
+    </div>
+
+    <div
+        class="favorites"
+        id="favorites">
+    </div>
+
+</section>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   NOVA WEATHER PRO 2.0
+   Fixed Persian / English city search
+===================================================== */
+
+
+/* =========================
+   API
+========================= */
+
+const GEO_API =
+    "https://geocoding-api.open-meteo.com/v1/search";
+
+const WEATHER_API =
+    "https://api.open-meteo.com/v1/forecast";
+
+
+/* =========================
+   STATE
+========================= */
+
+let currentPlace = null;
+let currentWeather = null;
+
+let favorites =
+    JSON.parse(
+        localStorage.getItem("novaFavorites") || "[]"
+    );
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const cityInput =
+    document.getElementById("cityInput");
+
+const searchBtn =
+    document.getElementById("searchBtn");
+
+const locationBtn =
+    document.getElementById("locationBtn");
+
+const suggestions =
+    document.getElementById("suggestions");
+
+const loading =
+    document.getElementById("loading");
+
+const errorBox =
+    document.getElementById("error");
+
+
+/* =========================
+   PERSIAN NORMALIZER
+========================= */
+
+function normalizeText(text){
+
+    return text
+        .trim()
+        .toLowerCase()
+
+        // Arabic Yeh → Persian Yeh
+        .replace(/ي/g,"ی")
+
+        // Arabic Kaf → Persian Kaf
+        .replace(/ك/g,"ک")
+
+        // remove ZWNJ
+        .replace(/\u200c/g," ")
+
+        // Persian numbers
+        .replace(/[۰-۹]/g,d =>
+            "۰۱۲۳۴۵۶۷۸۹".indexOf(d)
+        )
+
+        // Arabic numbers
+        .replace(/[٠-٩]/g,d =>
+            "٠١٢٣٤٥٦٧٨٩".indexOf(d)
+        )
+
+        // multiple spaces
+        .replace(/\s+/g," ")
+
+        .trim();
+}
+
+
+/* =========================
+   CITY ALIASES
+========================= */
+
+const cityAliases = {
+
+    "تهران":"Tehran",
+    "tehran":"Tehran",
+
+    "مشهد":"Mashhad",
+    "mashhad":"Mashhad",
+
+    "اصفهان":"Isfahan",
+    "isfahan":"Isfahan",
+
+    "شیراز":"Shiraz",
+    "شيراز":"Shiraz",
+    "shiraz":"Shiraz",
+
+    "تبریز":"Tabriz",
+    "تبريز":"Tabriz",
+    "tabriz":"Tabriz",
+
+    "کرج":"Karaj",
+    "کرج":"Karaj",
+    "karaj":"Karaj",
+
+    "قم":"Qom",
+    "qom":"Qom",
+
+    "اهواز":"Ahvaz",
+    "ahvaz":"Ahvaz",
+
+    "رشت":"Rasht",
+    "rasht":"Rasht",
+
+    "کرمان":"Kerman",
+    "kerman":"Kerman",
+
+    "ارومیه":"Urmia",
+    "اروميه":"Urmia",
+    "urmia":"Urmia",
+
+    "یزد":"Yazd",
+    "yazd":"Yazd",
+
+    "اردبیل":"Ardabil",
+    "اردبيل":"Ardabil",
+    "ardabil":"Ardabil",
+
+    "زنجان":"Zanjan",
+    "zanjan":"Zanjan",
+
+    "سنندج":"Sanandaj",
+    "sanandaj":"Sanandaj",
+
+    "بندرعباس":"Bandar Abbas",
+    "bandar abbas":"Bandar Abbas",
+
+    "همدان":"Hamadan",
+    "hamadan":"Hamadan",
+
+    "قزوین":"Qazvin",
+    "قزوين":"Qazvin",
+    "qazvin":"Qazvin",
+
+    "ساری":"Sari",
+    "ساري":"Sari",
+    "sari":"Sari",
+
+    "بوشهر":"Bushehr",
+    "bushehr":"Bushehr",
+
+    "خرم‌آباد":"Khorramabad",
+    "خرم اباد":"Khorramabad",
+    "خرم آباد":"Khorramabad",
+    "khorramabad":"Khorramabad"
+};
+
+
+/* =========================
+   UI HELPERS
+========================= */
+
+function setLoading(value){
+
+    loading.style.display =
+        value ? "flex" : "none";
+
+    searchBtn.disabled = value;
+
+    searchBtn.textContent =
+        value ? "در حال جستجو..." : "جستجوی شهر";
+}
+
+
+function showError(message){
+
+    errorBox.textContent = message;
+    errorBox.style.display = "block";
+}
+
+
+function hideError(){
+
+    errorBox.style.display = "none";
+}
+
+
+function escapeHTML(text){
+
+    return String(text ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+
+/* =========================
+   SEARCH GEOCODING
+========================= */
+
+async function searchLocations(query){
+
+    const original =
+        normalizeText(query);
+
+    if(original.length < 2){
+
+        return [];
+    }
+
+    const englishAlias =
+        cityAliases[original] || original;
+
+    const queries = [];
+
+    // اول همان چیزی که کاربر نوشته
+    queries.push({
+        name: original,
+        language: "fa"
+    });
+
+    // نسخه انگلیسی در صورت وجود
+    if(
+        englishAlias &&
+        englishAlias !== original
+    ){
+
+        queries.push({
+            name: englishAlias,
+            language: "en"
+        });
+    }
+
+    // یک جستجوی انگلیسی عمومی
+    if(
+        !queries.some(
+            x => x.name === original &&
+                 x.language === "en"
+        )
+    ){
+
+        queries.push({
+            name: original,
+            language: "en"
+        });
+    }
+
+
+    let all = [];
+
+
+    for(const item of queries){
+
+        try{
+
+            const url =
+                GEO_API +
+                "?name=" +
+                encodeURIComponent(item.name) +
+                "&count=10" +
+                "&language=" +
+                item.language +
+                "&format=json";
+
+            const response =
+                await fetch(url);
+
+            if(!response.ok){
+                continue;
+            }
+
+            const data =
+                await response.json();
+
+            if(
+                data &&
+                Array.isArray(data.results)
+            ){
+
+                all.push(...data.results);
+            }
+
+        }catch(e){
+            console.warn(
+                "Geocoding error:",
+                e
+            );
+        }
+    }
+
+
+    /* حذف نتایج تکراری */
+
+    const unique = [];
+
+    const seen = new Set();
+
+    for(const place of all){
+
+        const key =
+            [
+                place.latitude,
+                place.longitude,
+                place.name
+            ].join("|");
+
+        if(!seen.has(key)){
+
+            seen.add(key);
+            unique.push(place);
+        }
+    }
+
+
+    /* شهرهای ایران را در صورت جستجوی فارسی ترجیح بده */
+
+    if(
+        /[آ-ی]/.test(original)
+    ){
+
+        unique.sort((a,b)=>{
+
+            const ai =
+                a.country_code === "IR"
+                    ? 0
+                    : 1;
+
+            const bi =
+                b.country_code === "IR"
+                    ? 0
+                    : 1;
+
+            return ai-bi;
+        });
+    }
+
+
+    return unique.slice(0,8);
+}
+
+
+/* =========================
+   SHOW SUGGESTIONS
+========================= */
+
+async function showSuggestions(){
+
+    const query =
+        cityInput.value;
+
+    if(normalizeText(query).length < 2){
+
+        suggestions.style.display = "none";
+        return;
+    }
+
+
+    const results =
+        await searchLocations(query);
+
+
+    suggestions.innerHTML = "";
+
+
+    if(!results.length){
+
+        suggestions.innerHTML = `
+            <div class="suggestion">
+                <strong>شهری پیدا نشد</strong>
+                <span>
+                    نام شهر را کامل‌تر وارد کنید
+                </span>
+            </div>
+        `;
+
+        suggestions.style.display = "block";
+
+        return;
+    }
+
+
+    results.forEach(place => {
+
+        const item =
+            document.createElement("div");
+
+        item.className = "suggestion";
+
+        const country =
+            place.country || "";
+
+        const admin =
+            place.admin1 || "";
+
+        item.innerHTML = `
+            <strong>
+                ${escapeHTML(place.name)}
+            </strong>
+
+            <span>
+                ${escapeHTML(admin)}
+                ${admin && country ? "، " : ""}
+                ${escapeHTML(country)}
+            </span>
+        `;
+
+
+        item.addEventListener(
+            "click",
+            () => {
+
+                cityInput.value =
+                    place.name;
+
+                suggestions.style.display =
+                    "none";
+
+                loadWeather(
+                    place
+                );
+            }
+        );
+
+
+        suggestions.appendChild(item);
+
+    });
+
+
+    suggestions.style.display =
+        "block";
+}
+
+
+/* =========================
+   FIND EXACT PLACE
+========================= */
+
+async function findPlace(query){
+
+    const results =
+        await searchLocations(query);
+
+    if(!results.length){
+        return null;
+    }
+
+
+    const normalized =
+        normalizeText(query);
+
+
+    const englishAlias =
+        cityAliases[normalized];
+
+
+    /* اول تطابق دقیق */
+
+    let exact =
+        results.find(place =>
+
+            normalizeText(
+                place.name
+            ) === normalized
+
+        );
+
+
+    /* تطابق با alias */
+
+    if(!exact && englishAlias){
+
+        exact =
+            results.find(place =>
+
+                normalizeText(
+                    place.name
+                ) ===
+                normalizeText(
+                    englishAlias
+                )
+
+            );
+    }
+
+
+    /* اگر ایران بود، نتیجه ایرانی */
+
+    if(!exact){
+
+        exact =
+            results.find(
+                p =>
+                p.country_code === "IR"
+            );
+    }
+
+
+    return exact || results[0];
+}
+
+
+/* =========================
+   WEATHER API
+========================= */
+
+async function fetchWeather(place){
+
+    const params = new URLSearchParams({
+
+        latitude:
+            String(place.latitude),
+
+        longitude:
+            String(place.longitude),
+
+        timezone:
+            "auto",
+
+        forecast_days:
+            "7",
+
+        hourly:
+            [
+                "temperature_2m",
+                "relative_humidity_2m",
+                "apparent_temperature",
+                "precipitation_probability",
+                "precipitation",
+                "weather_code",
+                "pressure_msl",
+                "visibility",
+                "wind_speed_10m",
+                "wind_direction_10m"
+            ].join(","),
+
+        daily:
+            [
+                "weather_code",
+                "temperature_2m_max",
+                "temperature_2m_min",
+                "sunrise",
+                "sunset",
+                "uv_index_max",
+                "precipitation_sum",
+                "precipitation_probability_max"
+            ].join(","),
+
+        current:
+            [
+                "temperature_2m",
+                "relative_humidity_2m",
+                "apparent_temperature",
+                "precipitation",
+                "weather_code",
+                "surface_pressure",
+                "wind_speed_10m",
+                "wind_direction_10m"
+            ].join(",")
+    });
+
+
+    const response =
+        await fetch(
+            WEATHER_API +
+            "?" +
+            params.toString()
+        );
+
+
+    if(!response.ok){
+
+        throw new Error(
+            "Weather API Error: " +
+            response.status
+        );
+    }
+
+
+    const data =
+        await response.json();
+
+
+    if(
+        data.error
+    ){
+
+        throw new Error(
+            data.reason ||
+            "خطا در دریافت آب‌وهوا"
+        );
+    }
+
+
+    return data;
+}
+
+
+/* =========================
+   LOAD WEATHER
+========================= */
+
+async function loadWeather(place){
+
+    if(!place){
+        return;
+    }
+
+    hideError();
+    setLoading(true);
+
+    try{
+
+        const weather =
+            await fetchWeather(place);
+
+
+        currentPlace =
+            place;
+
+        currentWeather =
+            weather;
+
+
+        cityInput.value =
+            place.name;
+
+
+        renderWeather(
+            place,
+            weather
+        );
+
+
+        saveFavorite(
+            place
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showError(
+            "دریافت اطلاعات آب‌وهوا انجام نشد. اینترنت و نام شهر را بررسی کنید."
+        );
+
+    }finally{
+
+        setLoading(false);
+    }
+}
+
+
+/* =========================
+   SEARCH BUTTON
+========================= */
+
+async function searchCity(){
+
+    const query =
+        cityInput.value.trim();
+
+
+    if(query.length < 2){
+
+        showError(
+            "حداقل دو حرف از نام شهر را وارد کنید."
+        );
+
+        return;
+    }
+
+
+    hideError();
+
+    suggestions.style.display =
+        "none";
+
+    setLoading(true);
+
+
+    try{
+
+        const place =
+            await findPlace(query);
+
+
+        if(!place){
+
+            throw new Error(
+                "CITY_NOT_FOUND"
+            );
+        }
+
+
+        const weather =
+            await fetchWeather(place);
+
+
+        currentPlace =
+            place;
+
+        currentWeather =
+            weather;
+
+
+        renderWeather(
+            place,
+            weather
+        );
+
+
+        saveFavorite(
+            place
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showError(
+            "شهر موردنظر پیدا نشد یا دریافت آب‌وهوا با خطا روبه‌رو شد. مثلا «تهران» یا «Tehran» را امتحان کنید."
+        );
+
+    }finally{
+
+        setLoading(false);
+    }
+}
+
+
+/* =========================
+   WEATHER CODES
+========================= */
+
+function weatherInfo(code){
+
+    const map = {
+
+        0:
+        ["آسمان صاف","☀️","sunny"],
+
+        1:
+        ["عمدتاً صاف","🌤️","sunny"],
+
+        2:
+        ["کمی ابری","⛅","cloudy"],
+
+        3:
+        ["ابری","☁️","cloudy"],
+
+        45:
+        ["مه","🌫️","cloudy"],
+
+        48:
+        ["مه یخ‌زده","🌫️","cloudy"],
+
+        51:
+        ["نم‌نم باران","🌦️","rainy"],
+
+        53:
+        ["باران ملایم","🌦️","rainy"],
+
+        55:
+        ["باران","🌧️","rainy"],
+
+        56:
+        ["باران یخ‌زده","🌧️","rainy"],
+
+        57:
+        ["باران یخ‌زده شدید","🌧️","rainy"],
+
+        61:
+        ["باران ملایم","🌧️","rainy"],
+
+        63:
+        ["باران","🌧️","rainy"],
+
+        65:
+        ["باران شدید","🌧️","rainy"],
+
+        66:
+        ["باران یخ‌زده","🌧️","rainy"],
+
+        67:
+        ["باران یخ‌زده شدید","🌧️","rainy"],
+
+        71:
+        ["برف ملایم","🌨️","snowy"],
+
+        73:
+        ["برف","❄️","snowy"],
+
+        75:
+        ["برف شدید","❄️","snowy"],
+
+        77:
+        ["دانه‌های برف","🌨️","snowy"],
+
+        80:
+        ["رگبار ملایم","🌦️","rainy"],
+
+        81:
+        ["رگبار","🌧️","rainy"],
+
+        82:
+        ["رگبار شدید","⛈️","storm"],
+
+        85:
+        ["رگبار برفی","🌨️","snowy"],
+
+        86:
+        ["رگبار برفی شدید","❄️","snowy"],
+
+        95:
+        ["رعدوبرق","⛈️","storm"],
+
+        96:
+        ["رعدوبرق و تگرگ","⛈️","storm"],
+
+        99:
+        ["رعدوبرق و تگرگ شدید","⛈️","storm"]
+    };
+
+
+    return map[code] ||
+        ["نامشخص","🌤️","cloudy"];
+}
+
+
+/* =========================
+   CURRENT HOUR
+   مهم:
+   دیگر از ساعت مرورگر استفاده نمی‌کنیم.
+   خود API زمان محلی شهر را می‌دهد.
+========================= */
+
+function findCurrentHour(weather){
+
+    if(
+        !weather.hourly ||
+        !weather.hourly.time
+    ){
+
+        return 0;
+    }
+
+
+    const currentTime =
+        weather.current &&
+        weather.current.time;
+
+
+    if(!currentTime){
+
+        return 0;
+    }
+
+
+    const times =
+        weather.hourly.time;
+
+
+    let bestIndex = 0;
+    let bestDiff = Infinity;
+
+
+    const currentDate =
+        new Date(currentTime);
+
+
+    times.forEach(
+        (time,index)=>{
+
+            const date =
+                new Date(time);
+
+            const diff =
+                Math.abs(
+                    date.getTime() -
+                    currentDate.getTime()
+                );
+
+
+            if(diff < bestDiff){
+
+                bestDiff =
+                    diff;
+
+                bestIndex =
+                    index;
+            }
+        }
+    );
+
+
+    return bestIndex;
+}
+
+
+/* =========================
+   RENDER MAIN
+========================= */
+
+function renderWeather(
+    place,
+    weather
+){
+
+    const current =
+        weather.current;
+
+
+    const info =
+        weatherInfo(
+            current.weather_code
+        );
+
+
+    document.body.className =
+        info[2];
+
+
+    document.getElementById(
+        "locationName"
+    ).textContent =
+        place.name;
+
+
+    document.getElementById(
+        "locationMeta"
+    ).textContent =
+        [
+            place.admin1,
+            place.country
+        ]
+        .filter(Boolean)
+        .join("، ");
+
+
+    document.getElementById(
+        "weatherIcon"
+    ).textContent =
+        info[1];
+
+
+    document.getElementById(
+        "temperature"
+    ).innerHTML =
+        Math.round(
+            current.temperature_2m
+        ) +
+        `<span class="degree">°</span>`;
+
+
+    document.getElementById(
+        "condition"
+    ).textContent =
+        info[0];
+
+
+    document.getElementById(
+        "feels"
+    ).textContent =
+        "احساس می‌شود: " +
+        Math.round(
+            current.apparent_temperature
+        ) +
+        "°";
+
+
+    document.getElementById(
+        "humidity"
+    ).textContent =
+        Math.round(
+            current.relative_humidity_2m
+        ) +
+        "%";
+
+
+    document.getElementById(
+        "wind"
+    ).textContent =
+        Math.round(
+            current.wind_speed_10m
+        ) +
+        " km/h";
+
+
+    const index =
+        findCurrentHour(weather);
+
+
+    const rainChance =
+        weather.hourly
+        .precipitation_probability[index];
+
+
+    document.getElementById(
+        "rainChance"
+    ).textContent =
+        (rainChance ?? 0) +
+        "%";
+
+
+    const visibility =
+        weather.hourly
+        .visibility[index];
+
+
+    document.getElementById(
+        "visibility"
+    ).textContent =
+        visibility != null
+        ? formatVisibility(visibility)
+        : "--";
+
+
+    document.getElementById(
+        "pressure"
+    ).textContent =
+        Math.round(
+            current.surface_pressure
+        ) +
+        " hPa";
+
+
+    document.getElementById(
+        "windDirection"
+    ).textContent =
+        directionName(
+            current.wind_direction_10m
+        );
+
+
+    document.getElementById(
+        "precipitation"
+    ).textContent =
+        Number(
+            current.precipitation || 0
+        ).toFixed(1) +
+        " mm";
+
+
+    const todayUV =
+        weather.daily
+        .uv_index_max[0];
+
+
+    document.getElementById(
+        "uv"
+    ).textContent =
+        Number(
+            todayUV || 0
+        ).toFixed(1);
+
+
+    document.getElementById(
+        "sunrise"
+    ).textContent =
+        formatTime(
+            weather.daily.sunrise[0]
+        );
+
+
+    document.getElementById(
+        "sunset"
+    ).textContent =
+        formatTime(
+            weather.daily.sunset[0]
+        );
+
+
+    document.getElementById(
+        "coordinates"
+    ).textContent =
+        `${Number(place.latitude).toFixed(3)}°, ${Number(place.longitude).toFixed(3)}°`;
+
+
+    document.getElementById(
+        "updated"
+    ).textContent =
+        "آخرین اطلاعات: " +
+        formatTime(
+            current.time
+        );
+
+
+    document.getElementById(
+        "localTime"
+    ).textContent =
+        "زمان محلی: " +
+        formatDateTime(
+            current.time
+        );
+
+
+    updateAlert(
+        current,
+        weather,
+        index
+    );
+
+
+    renderHourly(
+        weather,
+        index
+    );
+
+
+    renderForecast(
+        weather
+    );
+
+
+    drawChart(
+        weather,
+        index
+    );
+
+
+    updateMap(
+        place
+    );
+
+
+    createWeatherEffects(
+        info[2]
+    );
+
+
+    updateFavoriteButton();
+}
+
+
+/* =========================
+   VISIBILITY
+========================= */
+
+function formatVisibility(meters){
+
+    const km =
+        meters / 1000;
+
+    return km >= 10
+        ? "10+ km"
+        : km.toFixed(1) + " km";
+}
+
+
+/* =========================
+   WIND DIRECTION
+========================= */
+
+function directionName(deg){
+
+    const directions = [
+        "شمال",
+        "شمال‌شرق",
+        "شرق",
+        "جنوب‌شرق",
+        "جنوب",
+        "جنوب‌غرب",
+        "غرب",
+        "شمال‌غرب"
+    ];
+
+
+    const index =
+        Math.round(
+            deg / 45
+        ) % 8;
+
+
+    return directions[index];
+}
+
+
+/* =========================
+   TIME
+========================= */
+
+function formatTime(value){
+
+    if(!value){
+        return "--";
+    }
+
+    const parts =
+        String(value)
+        .split("T");
+
+    if(parts.length < 2){
+        return value;
+    }
+
+    return parts[1]
+        .slice(0,5);
+}
+
+
+function formatDateTime(value){
+
+    if(!value){
+        return "--";
+    }
+
+    const parts =
+        String(value)
+        .split("T");
+
+    if(parts.length < 2){
+        return value;
+    }
+
+    return (
+        parts[0] +
+        " • " +
+        parts[1].slice(0,5)
+    );
+}
+
+
+/* =========================
+   HOURLY
+========================= */
+
+function renderHourly(
+    weather,
+    currentIndex
+){
+
+    const box =
+        document.getElementById(
+            "hourly"
+        );
+
+
+    box.innerHTML = "";
+
+
+    const h =
+        weather.hourly;
+
+
+    for(
+        let i=currentIndex;
+        i<Math.min(
+            currentIndex+24,
+            h.time.length
+        );
+        i++
+    ){
+
+        const info =
+            weatherInfo(
+                h.weather_code[i]
+            );
+
+
+        const time =
+            formatTime(
+                h.time[i]
+            );
+
+
+        const rain =
+            h.precipitation_probability[i];
+
+
+        const card =
+            document.createElement(
+                "div"
+            );
+
+
+        card.className =
+            "hour" +
+            (
+                i === currentIndex
+                ? " current"
+                : ""
+            );
+
+
+        card.innerHTML = `
+
+            <div class="hour-time">
+                ${
+                    i === currentIndex
+                    ? "الان"
+                    : time
+                }
+            </div>
+
+            <div class="hour-icon">
+                ${info[1]}
+            </div>
+
+            <div class="hour-temp">
+                ${Math.round(
+                    h.temperature_2m[i]
+                )}°
+            </div>
+
+            <div class="hour-rain">
+                💧 ${rain ?? 0}%
+            </div>
+        `;
+
+
+        box.appendChild(card);
+    }
+}
+
+
+/* =========================
+   7 DAY FORECAST
+========================= */
+
+function renderForecast(weather){
+
+    const box =
+        document.getElementById(
+            "forecast"
+        );
+
+
+    box.innerHTML = "";
+
+
+    const d =
+        weather.daily;
+
+
+    for(
+        let i=0;
+        i<Math.min(7,d.time.length);
+        i++
+    ){
+
+        const info =
+            weatherInfo(
+                d.weather_code[i]
+            );
+
+
+        const date =
+            new Date(
+                d.time[i] +
+                "T12:00:00"
+            );
+
+
+        const dayName =
+            i === 0
+            ? "امروز"
+            : date.toLocaleDateString(
+                "fa-IR",
+                {
+                    weekday:"short"
+                }
+            );
+
+
+        const card =
+            document.createElement(
+                "div"
+            );
+
+
+        card.className =
+            "day";
+
+
+        card.innerHTML = `
+
+            <div class="day-name">
+                ${dayName}
+            </div>
+
+            <div class="day-icon">
+                ${info[1]}
+            </div>
+
+            <div class="day-temp">
+                ${Math.round(
+                    d.temperature_2m_max[i]
+                )}°
+            </div>
+
+            <div class="day-low">
+                ${Math.round(
+                    d.temperature_2m_min[i]
+                )}°
+            </div>
+
+        `;
+
+
+        box.appendChild(card);
+    }
+}
+
+
+/* =========================
+   ALERT
+========================= */
+
+function updateAlert(
+    current,
+    weather,
+    index
+){
+
+    const box =
+        document.getElementById(
+            "weatherAlert"
+        );
+
+
+    const code =
+        current.weather_code;
+
+
+    const rain =
+        weather.hourly
+        .precipitation_probability[index];
+
+
+    if(
+        code >= 95
+    ){
+
+        box.textContent =
+            "⛈️ احتمال رعدوبرق وجود دارد. در زمان فعالیت طوفان احتیاط کنید.";
+
+        return;
+    }
+
+
+    if(
+        code >= 71 &&
+        code <= 86
+    ){
+
+        box.textContent =
+            "❄️ شرایط برفی گزارش شده است.";
+
+        return;
+    }
+
+
+    if(
+        rain >= 70
+    ){
+
+        box.textContent =
+            "🌧️ احتمال بارش در ساعات پیش‌رو بالاست.";
+
+        return;
+    }
+
+
+    if(
+        current.temperature_2m >= 35
+    ){
+
+        box.textContent =
+            "🔥 دمای هوا بالاست؛ شرایط گرم را در نظر بگیرید.";
+
+        return;
+    }
+
+
+    if(
+        current.temperature_2m <= 0
+    ){
+
+        box.textContent =
+            "🥶 دمای هوا نزدیک یا پایین صفر درجه است.";
+
+        return;
+    }
+
+
+    box.textContent =
+        "✨ در حال حاضر هشدار مهمی از داده‌های هواشناسی شناسایی نشد.";
+}
+
+
+/* =========================
+   TEMPERATURE CHART
+========================= */
+
+function drawChart(
+    weather,
+    currentIndex
+){
+
+    const canvas =
+        document.getElementById(
+            "temperatureChart"
+        );
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        rect.width * dpr;
+
+    canvas.height =
+        rect.height * dpr;
+
+
+    ctx.scale(
+        dpr,
+        dpr
+    );
+
+
+    const width =
+        rect.width;
+
+    const height =
+        rect.height;
+
+
+    const h =
+        weather.hourly;
+
+
+    const temps =
+        h.temperature_2m.slice(
+            currentIndex,
+            currentIndex+24
+        );
+
+
+    if(!temps.length){
+        return;
+    }
+
+
+    const min =
+        Math.min(...temps) - 2;
+
+    const max =
+        Math.max(...temps) + 2;
+
+
+    const padding = 30;
+
+
+    function x(i){
+
+        return padding +
+            i *
+            (
+                (width-padding*2) /
+                Math.max(
+                    1,
+                    temps.length-1
+                )
+            );
+    }
+
+
+    function y(value){
+
+        return height-padding -
+            (
+                (value-min) /
+                (max-min)
+            ) *
+            (height-padding*2);
+    }
+
+
+    /* background grid */
+
+    ctx.lineWidth = 1;
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,.08)";
+
+
+    for(
+        let i=0;
+        i<5;
+        i++
+    ){
+
+        const yy =
+            padding +
+            i *
+            (
+                (height-padding*2)/4
+            );
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            padding,
+            yy
+        );
+
+        ctx.lineTo(
+            width-padding,
+            yy
+        );
+
+        ctx.stroke();
+    }
+
+
+    /* fill */
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            height
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "rgba(75,210,255,.22)"
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(75,210,255,0)"
+    );
+
+
+    ctx.beginPath();
+
+    temps.forEach(
+        (temp,i)=>{
+
+            const xx = x(i);
+            const yy = y(temp);
+
+            if(i===0){
+                ctx.moveTo(
+                    xx,
+                    yy
+                );
+            }else{
+                ctx.lineTo(
+                    xx,
+                    yy
+                );
+            }
+        }
+    );
+
+
+    ctx.lineTo(
+        x(temps.length-1),
+        height-padding
+    );
+
+    ctx.lineTo(
+        x(0),
+        height-padding
+    );
+
+    ctx.closePath();
+
+    ctx.fillStyle =
+        gradient;
+
+    ctx.fill();
+
+
+    /* line */
+
+    ctx.beginPath();
+
+
+    temps.forEach(
+        (temp,i)=>{
+
+            const xx = x(i);
+            const yy = y(temp);
+
+
+            if(i===0){
+
+                ctx.moveTo(
+                    xx,
+                    yy
+                );
+
+            }else{
+
+                ctx.lineTo(
+                    xx,
+                    yy
+                );
+            }
+        }
+    );
+
+
+    ctx.strokeStyle =
+        "#62dfff";
+
+    ctx.lineWidth = 3;
+
+    ctx.stroke();
+
+
+    /* points */
+
+    temps.forEach(
+        (temp,i)=>{
+
+            const xx = x(i);
+            const yy = y(temp);
+
+
+            ctx.beginPath();
+
+            ctx.arc(
+                xx,
+                yy,
+                4,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fillStyle =
+                "#fff";
+
+            ctx.fill();
+
+
+            if(
+                i % 4 === 0
+            ){
+
+                ctx.fillStyle =
+                    "rgba(255,255,255,.7)";
+
+                ctx.font =
+                    "11px Arial";
+
+                ctx.textAlign =
+                    "center";
+
+                ctx.fillText(
+                    Math.round(temp)+"°",
+                    xx,
+                    yy-12
+                );
+            }
+        }
+    );
+}
+
+
+/* =========================
+   MAP
+========================= */
+
+function updateMap(place){
+
+    const pin =
+        document.getElementById(
+            "mapPin"
+        );
+
+
+    const label =
+        document.getElementById(
+            "mapLabel"
+        );
+
+
+    /*
+       این نقشه فعلاً نمایشی است.
+       مختصات واقعی شهر از API استفاده می‌شود.
+    */
+
+
+    const lat =
+        Number(place.latitude);
+
+    const lon =
+        Number(place.longitude);
+
+
+    /*
+       تبدیل تقریبی مختصات به جای پین
+       فقط برای ظاهر داشبورد
+    */
+
+    const left =
+        Math.max(
+            8,
+            Math.min(
+                88,
+                ((lon + 180) / 360) * 100
+            )
+        );
+
+
+    const top =
+        Math.max(
+            10,
+            Math.min(
+                82,
+                ((90 - lat) / 180) * 100
+            )
+        );
+
+
+    pin.style.left =
+        left + "%";
+
+
+    pin.style.top =
+        top + "%";
+
+
+    label.textContent =
+        place.name;
+}
+
+
+/* =========================
+   WEATHER EFFECTS
+========================= */
+
+function createWeatherEffects(
+    type
+){
+
+    const container =
+        document.getElementById(
+            "weatherEffects"
+        );
+
+
+    container
+        .querySelectorAll(
+            ".rain-drop,.snow-flake"
+        )
+        .forEach(
+            el => el.remove()
+        );
+
+
+    if(
+        type === "rainy" ||
+        type === "storm"
+    ){
+
+        for(
+            let i=0;
+            i<70;
+            i++
+        ){
+
+            const drop =
+                document.createElement(
+                    "div"
+                );
+
+
+            drop.className =
+                "rain-drop";
+
+
+            drop.style.left =
+                Math.random()*100 +
+                "%";
+
+
+            drop.style.animationDuration =
+                (.45 +
+                Math.random()*.6) +
+                "s";
+
+
+            drop.style.animationDelay =
+                Math.random()*2 +
+                "s";
+
+
+            container.appendChild(
+                drop
+            );
+        }
+    }
+
+
+    if(type === "snowy"){
+
+        for(
+            let i=0;
+            i<45;
+            i++
+        ){
+
+            const snow =
+                document.createElement(
+                    "div"
+                );
+
+
+            snow.className =
+                "snow-flake";
+
+
+            snow.textContent =
+                "❄";
+
+
+            snow.style.left =
+                Math.random()*100 +
+                "%";
+
+
+            snow.style.fontSize =
+                (8 +
+                Math.random()*12) +
+                "px";
+
+
+            snow.style.animationDuration =
+                (5 +
+                Math.random()*8) +
+                "s";
+
+
+            snow.style.animationDelay =
+                Math.random()*5 +
+                "s";
+
+
+            container.appendChild(
+                snow
+            );
+        }
+    }
+}
+
+
+/* =========================
+   FAVORITES
+========================= */
+
+function saveFavorite(place){
+
+    const exists =
+        favorites.some(
+            item =>
+            item.latitude ===
+            place.latitude &&
+            item.longitude ===
+            place.longitude
+        );
+
+
+    if(!exists){
+
+        favorites.unshift({
+
+            name:place.name,
+
+            country:
+                place.country || "",
+
+            admin1:
+                place.admin1 || "",
+
+            latitude:
+                place.latitude,
+
+            longitude:
+                place.longitude
+        });
+
+
+        favorites =
+            favorites.slice(
+                0,
+                5
+            );
+
+
+        localStorage.setItem(
+            "novaFavorites",
+            JSON.stringify(
+                favorites
+            )
+        );
+    }
+
+
+    renderFavorites();
+}
+
+
+function renderFavorites(){
+
+    const box =
+        document.getElementById(
+            "favorites"
+        );
+
+
+    box.innerHTML = "";
+
+
+    if(!favorites.length){
+
+        box.innerHTML = `
+            <div class="fav">
+                <strong>هنوز شهری ذخیره نشده</strong>
+                <small>
+                    با جستجوی شهر، اینجا اضافه می‌شود
+                </small>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    favorites.forEach(
+        place => {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "fav";
+
+
+            item.innerHTML = `
+
+                <strong>
+                    ${escapeHTML(
+                        place.name
+                    )}
+                </strong>
+
+                <small>
+                    ${escapeHTML(
+                        place.country
+                    )}
+                </small>
+            `;
+
+
+            item.addEventListener(
+                "click",
+                () => {
+
+                    loadWeather(
+                        place
+                    );
+                }
+            );
+
+
+            box.appendChild(item);
+        }
+    );
+}
+
+
+function updateFavoriteButton(){
+
+    if(!currentPlace){
+        return;
+    }
+
+
+    const exists =
+        favorites.some(
+            item =>
+            item.latitude ===
+            currentPlace.latitude &&
+            item.longitude ===
+            currentPlace.longitude
+        );
+
+
+    document.getElementById(
+        "favoriteBtn"
+    ).textContent =
+        exists ? "★" : "☆";
+}
+
+
+/* =========================
+   FAVORITE BUTTON
+========================= */
+
+document.getElementById(
+    "favoriteBtn"
+).addEventListener(
+    "click",
+    () => {
+
+        if(!currentPlace){
+            return;
+        }
+
+
+        const index =
+            favorites.findIndex(
+                item =>
+                item.latitude ===
+                currentPlace.latitude &&
+                item.longitude ===
+                currentPlace.longitude
+            );
+
+
+        if(index >= 0){
+
+            favorites.splice(
+                index,
+                1
+            );
+
+        }else{
+
+            favorites.unshift({
+
+                name:
+                    currentPlace.name,
+
+                country:
+                    currentPlace.country || "",
+
+                admin1:
+                    currentPlace.admin1 || "",
+
+                latitude:
+                    currentPlace.latitude,
+
+                longitude:
+                    currentPlace.longitude
+            });
+
+
+            favorites =
+                favorites.slice(
+                    0,
+                    5
+                );
+        }
+
+
+        localStorage.setItem(
+            "novaFavorites",
+            JSON.stringify(
+                favorites
+            )
+        );
+
+
+        renderFavorites();
+
+        updateFavoriteButton();
+    }
+);
+
+
+/* =========================
+   SEARCH EVENTS
+========================= */
+
+searchBtn.addEventListener(
+    "click",
+    searchCity
+);
+
+
+cityInput.addEventListener(
+    "keydown",
+    e => {
+
+        if(e.key === "Enter"){
+
+            e.preventDefault();
+
+            searchCity();
+        }
+    }
+);
+
+
+/*
+   پیشنهادها با کمی تاخیر
+   برای جلوگیری از درخواست زیاد
+*/
+
+let suggestionTimer;
+
+
+cityInput.addEventListener(
+    "input",
+    () => {
+
+        clearTimeout(
+            suggestionTimer
+        );
+
+
+        suggestionTimer =
+            setTimeout(
+                showSuggestions,
+                350
+            );
+    }
+);
+
+
+/* بستن پیشنهادها */
+
+document.addEventListener(
+    "click",
+    e => {
+
+        if(
+            !e.target.closest(
+                ".search-wrapper"
+            )
+        ){
+
+            suggestions.style.display =
+                "none";
+        }
+    }
+);
+
+
+/* =========================
+   GEOLOCATION
+========================= */
+
+locationBtn.addEventListener(
+    "click",
+    () => {
+
+        if(
+            !navigator.geolocation
+        ){
+
+            showError(
+                "مرورگر شما از موقعیت مکانی پشتیبانی نمی‌کند."
+            );
+
+            return;
+        }
+
+
+        setLoading(true);
+        hideError();
+
+
+        navigator.geolocation.getCurrentPosition(
+
+            async position => {
+
+                try{
+
+                    const lat =
+                        position.coords.latitude;
+
+                    const lon =
+                        position.coords.longitude;
+
+
+                    /*
+                       برای مختصات فعلی:
+                       ابتدا مستقیماً آب‌وهوا را می‌گیریم.
+                    */
+
+                    const weather =
+                        await fetchWeather({
+
+                            name:"موقعیت فعلی",
+
+                            latitude:lat,
+
+                            longitude:lon,
+
+                            country:"",
+
+                            admin1:""
+                        });
+
+
+                    currentPlace = {
+
+                        name:"موقعیت فعلی",
+
+                        latitude:lat,
+
+                        longitude:lon,
+
+                        country:"",
+
+                        admin1:""
+                    };
+
+
+                    currentWeather =
+                        weather;
+
+
+                    /*
+                       برای نام شهر،
+                       یک geocoding معکوس ساده نداریم،
+                       بنابراین مختصات را نمایش می‌دهیم.
+                    */
+
+
+                    renderWeather(
+                        currentPlace,
+                        weather
+                    );
+
+
+                }catch(error){
+
+                    console.error(error);
+
+                    showError(
+                        "دریافت آب‌وهوای موقعیت فعلی انجام نشد."
+                    );
+
+                }finally{
+
+                    setLoading(false);
+                }
+            },
+
+
+            error => {
+
+                setLoading(false);
+
+                showError(
+                    "دسترسی به موقعیت مکانی داده نشد."
+                );
+            }
+        );
+    }
+);
+
+
+/* =========================
+   THEME BUTTON
+========================= */
+
+document.getElementById(
+    "themeBtn"
+).addEventListener(
+    "click",
+    () => {
+
+        document.body.classList.toggle(
+            "night"
+        );
+    }
+);
+
+
+/* =========================
+   RESIZE CHART
+========================= */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        if(
+            currentWeather &&
+            currentPlace
+        ){
+
+            const index =
+                findCurrentHour(
+                    currentWeather
+                );
+
+
+            drawChart(
+                currentWeather,
+                index
+            );
+        }
+    }
+);
+
+
+/* =========================
+   INIT
+========================= */
+
+renderFavorites();
+
+
+/*
+   شهر پیش‌فرض:
+   تهران
+*/
+
+(async function(){
+
+    try{
+
+        const place =
+            await findPlace(
+                "تهران"
+            );
+
+
+        if(place){
+
+            const weather =
+                await fetchWeather(
+                    place
+                );
+
+
+            currentPlace =
+                place;
+
+            currentWeather =
+                weather;
+
+
+            renderWeather(
+                place,
+                weather
+            );
+
+        }
+
+    }catch(error){
+
+        console.error(
+            "Initial weather error:",
+            error
+        );
+
+        /*
+           اگر تهران در شروع لود نشد،
+           کاربر همچنان می‌تواند جستجو کند.
+        */
+    }
+
+})();
+
+</script>
+
+</body>
+</html>
+```
